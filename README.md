@@ -64,6 +64,7 @@ If Git shows thousands of files ready to commit, check for the following:
 - Run `git status` to identify the exact paths marked as modified. If they aren't part of your change, discard them with `git checkout -- <path>` or revert everything with `git reset --hard` (be careful—this removes uncommitted work).
 
 Working locally avoids the latency of Codespaces and gives you more direct control over Git commits and branch management.
+> **Note:** Running `python Mason/app.py` directly will fail because Streamlit applications need to be executed through the `streamlit run` CLI so the framework can manage the web server.
 
 ## Optional configuration
 Set the following environment variables before launching the app if you want email/SMS notifications to work:
