@@ -29,6 +29,7 @@ If you prefer (for example, inside Codespaces where the `Run` button executes a 
 python Mason/app.py
 ```
 Both commands require the dependencies from `requirements.txt` to be installed first.
+> **Note:** Running `python Mason/app.py` directly will fail because Streamlit applications need to be executed through the `streamlit run` CLI so the framework can manage the web server.
 
 ## Optional configuration
 Set the following environment variables before launching the app if you want email/SMS notifications to work:

@@ -455,6 +455,14 @@ with tab1:
             )
 
             st.dataframe(styled_df, use_container_width=True, hide_index=True)
+            cols = ["symbol","price","change_percent","volume","high","low"]
+            df = df[[c for c in cols if c in df.columns]].copy()
+            if "price" in df:           df["price"]          = df["price"].astype(float).map(lambda x: f"${x:.2f}")
+            if "change_percent" in df:  df["change_percent"] = df["change_percent"].astype(float).map(lambda x: f"{x:+.2f}%")
+            if "volume" in df:          df["volume"]         = df["volume"].astype(float).map(lambda x: f"{x:,.0f}")
+            if "high" in df:            df["high"]           = df["high"].astype(float).map(lambda x: f"${x:.2f}")
+            if "low" in df:             df["low"]            = df["low"].astype(float).map(lambda x: f"${x:.2f}")
+            st.dataframe(df, use_container_width=True)
 
             c1, c2 = st.columns(2)
             with c1:
