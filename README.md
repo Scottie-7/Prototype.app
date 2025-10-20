@@ -24,6 +24,11 @@ Launch the Streamlit dashboard from the repository root:
 streamlit run Mason/app.py
 ```
 
+If you prefer (for example, inside Codespaces where the `Run` button executes a Python file), you can invoke the script directly thanks to the embedded bootstrapper:
+```bash
+python Mason/app.py
+```
+Both commands require the dependencies from `requirements.txt` to be installed first.
 > **Note:** Running `python Mason/app.py` directly will fail because Streamlit applications need to be executed through the `streamlit run` CLI so the framework can manage the web server.
 
 ## Optional configuration
