@@ -362,6 +362,18 @@ with tab1:
 
                     current_price = float(_get(["last_price", "lastPrice", "regularMarketPrice", "currentPrice"], 0.0) or 0.0)
                     previous_close = float(_get(["previousClose"], current_price) or current_price)
+                    day_open = float(
+                        _get(
+                            [
+                                "regularMarketOpen",
+                                "open",
+                                "dayOpen",
+                                "day_open",
+                            ],
+                            previous_close,
+                        )
+                        or previous_close
+                    )
                     day_high = float(_get(["dayHigh", "day_high"], current_price) or current_price)
                     day_low  = float(_get(["dayLow", "day_low"], current_price) or current_price)
                     volume   = float(_get(["lastVolume", "volume"], 0.0) or 0.0)
@@ -372,6 +384,7 @@ with tab1:
                         data = {
                             "symbol": sym,
                             "price": current_price,
+                            "open": day_open,
                             "previous_close": previous_close,
                             "price_change": price_change,
                             "change_percent": change_percent,
@@ -406,14 +419,42 @@ with tab1:
 
         if live_rows:
             df = pd.DataFrame(live_rows)
-            cols = ["symbol","price","change_percent","volume","high","low"]
-            df = df[[c for c in cols if c in df.columns]].copy()
-            if "price" in df:           df["price"]          = df["price"].astype(float).map(lambda x: f"${x:.2f}")
-            if "change_percent" in df:  df["change_percent"] = df["change_percent"].astype(float).map(lambda x: f"{x:+.2f}%")
-            if "volume" in df:          df["volume"]         = df["volume"].astype(float).map(lambda x: f"{x:,.0f}")
-            if "high" in df:            df["high"]           = df["high"].astype(float).map(lambda x: f"${x:.2f}")
-            if "low" in df:             df["low"]            = df["low"].astype(float).map(lambda x: f"${x:.2f}")
-            st.dataframe(df, use_container_width=True)
+            cols = ["symbol", "price", "open", "change_percent", "volume", "high", "low"]
+            df_display = df[[c for c in cols if c in df.columns]].copy()
+
+            def _fmt_currency(val: float) -> str:
+                return "" if pd.isna(val) else f"${val:,.2f}"
+
+            def _fmt_percent(val: float) -> str:
+                return "" if pd.isna(val) else f"{val:+.2f}%"
+
+            def _fmt_integer(val: float) -> str:
+                return "" if pd.isna(val) else f"{val:,.0f}"
+
+            def _highlight_row(row: pd.Series):
+                open_price = row.get("open")
+                current_price = row.get("price")
+                if pd.isna(open_price) or pd.isna(current_price):
+                    return [""] * len(row)
+                color = "rgba(34, 197, 94, 0.18)" if current_price >= open_price else "rgba(239, 68, 68, 0.18)"
+                return [f"background-color: {color}"] * len(row)
+
+            styled_df = (
+                df_display.style
+                .format(
+                    {
+                        "price": _fmt_currency,
+                        "open": _fmt_currency,
+                        "change_percent": _fmt_percent,
+                        "volume": _fmt_integer,
+                        "high": _fmt_currency,
+                        "low": _fmt_currency,
+                    }
+                )
+                .apply(_highlight_row, axis=1)
+            )
+
+            st.dataframe(styled_df, use_container_width=True, hide_index=True)
 
             c1, c2 = st.columns(2)
             with c1:
