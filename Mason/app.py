@@ -1604,6 +1604,30 @@ st.caption("Developed by Zia Quant Fund · 2025")
 
 
 if __name__ == "__main__":
+    # When executed via ``streamlit run`` a runtime is already active, so avoid
+    # bootstrapping again which raises ``Runtime instance already exists``.
+    already_running = False
+    try:
+        from streamlit.runtime import exists as runtime_exists  # type: ignore
+    except Exception:
+        runtime_exists = None
+
+    if runtime_exists is not None:
+        try:
+            already_running = runtime_exists()
+        except Exception:
+            already_running = False
+
+    if not already_running:
+        try:
+            from pathlib import Path
+            from streamlit.web import bootstrap
+
+            bootstrap.run(str(Path(__file__).resolve()), "", [], {})
+        except ModuleNotFoundError as exc:
+            raise ModuleNotFoundError(
+                "Streamlit is not installed. Install dependencies with `pip install -r requirements.txt`."
+            ) from exc
     try:
         from pathlib import Path
         from streamlit.web import bootstrap
